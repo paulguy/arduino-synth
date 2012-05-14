@@ -8,6 +8,8 @@
 
 int arduino;
 struct termios savedtio;
+char inb[512];
+int insize;
 
 void cleanup(int signal);
 
@@ -38,7 +40,7 @@ int main(int argc, char **argv) {
 	sigaction(SIGTERM, &inthandler, NULL);
 
 	attrib.mode = SQUARE;
-	for(;;) {
+	for(i = 100; i > 2; i--) {
 		for(i = 125; i > 64; i -= 4) {
 			attrib.lowval = -i;
 			attrib.highval = i;
@@ -50,7 +52,7 @@ int main(int argc, char **argv) {
 			nanosleep(&timereq, NULL);
 		}
 		timereq.tv_sec = 0;
-		timereq.tv_nsec = 200000000;
+		timereq.tv_nsec = 400000000;
 		nanosleep(&timereq, NULL);
 		for(i = 125; i > 64; i -= 4) {
 			attrib.lowval = -i + 64;
@@ -63,8 +65,12 @@ int main(int argc, char **argv) {
 			nanosleep(&timereq, NULL);
 		}
 		timereq.tv_sec = 0;
-		timereq.tv_nsec = 200000000;
+		timereq.tv_nsec = 400000000;
 		nanosleep(&timereq, NULL);
+		insize = read(arduino, inb, 512);
+		if(insize > 0) {
+			fwrite(inb, insize, 1, stderr);
+		}
 	}
 	
 	silence(arduino);

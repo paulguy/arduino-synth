@@ -9,7 +9,7 @@
   if(mode[X] == SQUARE) \
     outbyte += phase[X] > duty[X] ? highval[X] : lowval[X];
 
-unsigned long int nextmicros;
+long int nextmicros;
 // 4
 unsigned char mode[4]; //waveform
 unsigned int period[4]; //set period
@@ -19,7 +19,7 @@ char lowval[4]; //amplitude
 char highval[4];
 // 36
 
-void audioStep() {
+inline void audioStep() {
   char outbyte;
   // 1
   outbyte = 0;
@@ -80,16 +80,21 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly: 
   char ch;
-  if(Serial.available() >= 8) {
-    ch = Serial.read();
-    mode[ch] = (char)Serial.read();
-    period[ch] = (int)((char)Serial.read() << 8 | (char)Serial.read());
-    duty[ch] = (int)((char)Serial.read() << 8 | (char)Serial.read());
-    lowval[ch] = (char)Serial.read();
-    highval[ch] = (char)Serial.read();
+  long int thismicros;
+  while(Serial.available() >= 8) {
+    ch = char(Serial.read());
+    mode[ch] = char(Serial.read());
+    period[ch] = Serial.read() << 8;
+    period[ch] |= Serial.read();
+    duty[ch] = Serial.read() << 8;
+    duty[ch] |= Serial.read();
+    lowval[ch] = char(Serial.read());
+    highval[ch] = char(Serial.read());
   }
 
   audioStep();
-  while (micros() < nextmicros);
-  nextmicros = (micros() >> 7 + 1) << 7;
+  while(micros() < nextmicros);
+  thismicros = micros();
+  Serial.println(thismicros - nextmicros);
+  nextmicros = ((micros() >> 7) + 1) << 7;
 }
