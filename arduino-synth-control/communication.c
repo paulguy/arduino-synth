@@ -19,7 +19,8 @@ int initialize_serial(char *device, struct termios *oldtio) {
 		return(-1);
 	}
 
-	tcgetattr(fd,oldtio); /* save current port settings */
+	if(tcgetattr(fd,oldtio) < 0)
+		return(-1); /* save current port settings */
 
 	bzero(&newtio, sizeof(newtio));
 	newtio.c_cflag = B9600 | CS8 | CLOCAL | CREAD; 
@@ -29,8 +30,10 @@ int initialize_serial(char *device, struct termios *oldtio) {
 	/* set input mode (non-canonical, no echo,...) */
 	newtio.c_lflag = 0;
 
-	tcflush(fd, TCIFLUSH);
-	tcsetattr(fd, TCSANOW, &newtio);
+	if(tcflush(fd, TCIFLUSH) < 0)
+		return(-1);
+	if(tcsetattr(fd, TCSANOW, &newtio) < 0)
+		return(-1);
 
 	stop.mode = SILENT;
 	stop.period = 0;
@@ -44,15 +47,23 @@ void restore_serial(int fd, struct termios *oldtio) {
 	close(fd);
 }
 
-void send_serial(int fd, unsigned char channel, chanattr *attrib) {
-	write(fd, &channel, 1);
-	write(fd, &(attrib->mode), 1);
-	write(fd, &((unsigned char *)&(attrib->period))[1], 1);
-	write(fd, &((unsigned char *)&(attrib->period))[0], 1);
-	write(fd, &((unsigned char *)&(attrib->duty))[1], 1);
-	write(fd, &((unsigned char *)&(attrib->duty))[0], 1);
-	write(fd, &(attrib->lowval), 1);
-	write(fd, &(attrib->highval), 1);
+int send_serial(int fd, unsigned char channel, chanattr *attrib) {
+	if(write(fd, &channel, 1) < 0)
+		return(-1);
+	if(write(fd, &(attrib->mode), 1) < 0)
+		return(-1);
+	if(write(fd, &((unsigned char *)&(attrib->period))[1], 1) < 0)
+		return(-1);
+	if(write(fd, &((unsigned char *)&(attrib->period))[0], 1) < 0)
+		return(-1);
+	if(write(fd, &((unsigned char *)&(attrib->duty))[1], 1) < 0)
+		return(-1);
+	if(write(fd, &((unsigned char *)&(attrib->duty))[0], 1) < 0)
+		return(-1);
+	if(write(fd, &(attrib->lowval), 1) < 0)
+		return(-1);
+	if(write(fd, &(attrib->highval), 1) < 0)
+		return(-1);
 }
 
 void silence(int fd) {

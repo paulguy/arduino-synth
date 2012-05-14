@@ -11,5 +11,5 @@ typedef struct {
 
 int initialize_serial(char *device, struct termios *oldtio);
 void restore_serial(int fd, struct termios *oldtio);
-void send_serial(int fd, unsigned char channel, chanattr *attrib);
+int send_serial(int fd, unsigned char channel, chanattr *attrib);
 void silence(int fd);

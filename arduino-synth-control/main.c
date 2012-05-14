@@ -46,10 +46,15 @@ int main(int argc, char **argv) {
 			attrib.highval = i;
 			attrib.period = 200 - i;
 			attrib.duty = attrib.period / 2;
-			send_serial(arduino, 0, &attrib);
+			if(send_serial(arduino, 0, &attrib) < 0)
+				perror("send_serial");
 			timereq.tv_sec = 0;
 			timereq.tv_nsec = 10000000;
 			nanosleep(&timereq, NULL);
+			insize = read(arduino, inb, 512);
+			if(insize > 0) {
+				fwrite(inb, insize, 1, stderr);
+			}
 		}
 		timereq.tv_sec = 0;
 		timereq.tv_nsec = 400000000;
@@ -59,18 +64,19 @@ int main(int argc, char **argv) {
 			attrib.highval = i - 64;
 			attrib.period = 150 - i;
 			attrib.duty = 10;
-			send_serial(arduino, 1, &attrib);
+			if(send_serial(arduino, 1, &attrib) < 0)
+				perror("send_serial");
 			timereq.tv_sec = 0;
 			timereq.tv_nsec = 10000000;
 			nanosleep(&timereq, NULL);
+			insize = read(arduino, inb, 512);
+			if(insize > 0) {
+				fwrite(inb, insize, 1, stderr);
+			}
 		}
 		timereq.tv_sec = 0;
 		timereq.tv_nsec = 400000000;
 		nanosleep(&timereq, NULL);
-		insize = read(arduino, inb, 512);
-		if(insize > 0) {
-			fwrite(inb, insize, 1, stderr);
-		}
 	}
 	
 	silence(arduino);
