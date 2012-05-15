@@ -4,10 +4,11 @@
 //#define DEBUG
 
 #define DOCHANNEL(X) \
-  phase[X] += 1; \
-  phase[X] %= period[X]; \
-  if(mode[X] == SQUARE) \
-    outbyte += phase[X] > duty[X] ? highval[X] : lowval[X];
+  if(mode[X] == SQUARE) { \
+    phase[X] += 1; \
+    phase[X] %= period[X]; \
+    outbyte += phase[X] > duty[X] ? highval[X] : lowval[X]; \
+  }
 
 #define TIMER_CLOCK_FREQ 2000000.0 //2MHz for /8 prescale from 16MHz
 
@@ -116,6 +117,8 @@ void setup() {
   mode[2] = SILENT;
   mode[3] = SILENT;
   timerLoadValue=SetupTimer2(8000);
+  while(Serial.available())
+    Serial.read();
   Serial.print("Timer2 Load:");
   Serial.println(timerLoadValue,HEX);
 }

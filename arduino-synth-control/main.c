@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	sigaction(SIGTERM, &inthandler, NULL);
 
 	attrib.mode = SQUARE;
-	for(i = 100; i > 2; i--) {
+	for(;;) {
 		for(i = 125; i > 64; i -= 4) {
 			attrib.lowval = -i;
 			attrib.highval = i;
@@ -57,9 +57,9 @@ int main(int argc, char **argv) {
 			}
 		}
 		timereq.tv_sec = 0;
-		timereq.tv_nsec = 400000000;
+		timereq.tv_nsec = 850000000;
 		nanosleep(&timereq, NULL);
-		for(i = 125; i > 64; i -= 4) {
+/*		for(i = 125; i > 64; i -= 4) {
 			attrib.lowval = -i + 64;
 			attrib.highval = i - 64;
 			attrib.period = 150 - i;
@@ -77,6 +77,7 @@ int main(int argc, char **argv) {
 		timereq.tv_sec = 0;
 		timereq.tv_nsec = 400000000;
 		nanosleep(&timereq, NULL);
+*/
 	}
 	
 	silence(arduino);
