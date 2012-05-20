@@ -2,6 +2,8 @@
 #define SQUARE 1
 
 //#define DEBUG
+#define OUTPORT PORTC
+#define CTLPORT DDRC
 
 #define DOCHANNEL(X) \
   if(mode[X] == SQUARE) { \
@@ -72,14 +74,14 @@ inline void audioStep() {
   DOCHANNEL(3)
 
   if(outbyte & 0x80) {
-    PORTB = (unsigned char)outbyte >> 3 & B00001111;
+    OUTPORT = (unsigned char)outbyte >> 3 & B00001111;
 /*    digitalWrite(12, LOW);
     digitalWrite(11, ~(outbyte & 0x40));
     digitalWrite(10, ~(outbyte & 0x20));
     digitalWrite(9, ~(outbyte & 0x10));
     digitalWrite(8, ~(outbyte & 0x08)); */
   } else {
-    PORTB = (unsigned char)outbyte >> 3 | B00010000;
+    OUTPORT = (unsigned char)outbyte >> 3 | B00010000;
 /*    digitalWrite(12, HIGH);
     digitalWrite(11, outbyte & 0x40);
     digitalWrite(10, outbyte & 0x20);
@@ -91,8 +93,8 @@ inline void audioStep() {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  DDRB = B11111000;
-  PORTB = 0;
+  CTRLPORT = B11111000;
+  OUTPORT = 0;
   phase[0] = 0;
   phase[1] = 0;
   phase[2] = 0;

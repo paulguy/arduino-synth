@@ -42,8 +42,23 @@ int main(int argc, char **argv) {
 	attrib.mode = SQUARE;
 	for(;;) {
 		for(i = 0; i < 127; i++) {
-			attrib.lowval = 127;
-			attrib.highval = 127;
+			attrib.lowval = -i;
+			attrib.highval = 0;
+			attrib.period = 400;
+			attrib.duty = attrib.period / 2;
+			if(send_serial(arduino, 0, &attrib) < 0)
+				perror("send_serial");
+			timereq.tv_sec = 0;
+			timereq.tv_nsec = 50000000;
+			nanosleep(&timereq, NULL);
+			insize = read(arduino, inb, 512);
+			if(insize > 0) {
+				fwrite(inb, insize, 1, stderr);
+			}
+		}
+		for(i = 0; i < 127; i++) {
+			attrib.lowval = 0;
+			attrib.highval = i;
 			attrib.period = 400;
 			attrib.duty = attrib.period / 2;
 			if(send_serial(arduino, 0, &attrib) < 0)
