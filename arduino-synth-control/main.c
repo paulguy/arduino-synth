@@ -41,23 +41,23 @@ int main(int argc, char **argv) {
 
 	attrib.mode = SQUARE;
 	for(;;) {
-		for(i = 125; i > 64; i -= 4) {
-			attrib.lowval = -i;
-			attrib.highval = i;
-			attrib.period = 200 - i;
+		for(i = 0; i < 127; i++) {
+			attrib.lowval = 127;
+			attrib.highval = 127;
+			attrib.period = 400;
 			attrib.duty = attrib.period / 2;
 			if(send_serial(arduino, 0, &attrib) < 0)
 				perror("send_serial");
 			timereq.tv_sec = 0;
-			timereq.tv_nsec = 10000000;
+			timereq.tv_nsec = 50000000;
 			nanosleep(&timereq, NULL);
 			insize = read(arduino, inb, 512);
 			if(insize > 0) {
 				fwrite(inb, insize, 1, stderr);
 			}
 		}
-		timereq.tv_sec = 0;
-		timereq.tv_nsec = 850000000;
+		timereq.tv_sec = 1;
+		timereq.tv_nsec = 0;
 		nanosleep(&timereq, NULL);
 /*		for(i = 125; i > 64; i -= 4) {
 			attrib.lowval = -i + 64;

@@ -71,43 +71,28 @@ inline void audioStep() {
   DOCHANNEL(2)
   DOCHANNEL(3)
 
-#ifdef DEBUG
-/*  Serial.print(outbyte & 0x80);
-  Serial.print(outbyte & 0x40);
-  Serial.print(outbyte & 0x20);
-  Serial.print(outbyte & 0x10);
-  Serial.print(outbyte & 0x08);*/
-  Serial.println((int)outbyte);
-#else
   if(outbyte & 0x80) {
-    digitalWrite(2, LOW);
-    digitalWrite(3, ~(outbyte & 0x40));
-    digitalWrite(4, ~(outbyte & 0x20));
-    digitalWrite(5, ~(outbyte & 0x10));
-    digitalWrite(6, ~(outbyte & 0x08));
+    PORTB = (unsigned char)outbyte >> 3 & B00001111;
+/*    digitalWrite(12, LOW);
+    digitalWrite(11, ~(outbyte & 0x40));
+    digitalWrite(10, ~(outbyte & 0x20));
+    digitalWrite(9, ~(outbyte & 0x10));
+    digitalWrite(8, ~(outbyte & 0x08)); */
   } else {
-    digitalWrite(2, HIGH);
-    digitalWrite(3, outbyte & 0x40);
-    digitalWrite(4, outbyte & 0x20);
-    digitalWrite(5, outbyte & 0x10);
-    digitalWrite(6, outbyte & 0x08);
+    PORTB = (unsigned char)outbyte >> 3 | B00010000;
+/*    digitalWrite(12, HIGH);
+    digitalWrite(11, outbyte & 0x40);
+    digitalWrite(10, outbyte & 0x20);
+    digitalWrite(9, outbyte & 0x10);
+    digitalWrite(8, outbyte & 0x08); */
   }
-#endif
 }
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(2, OUTPUT);
-  digitalWrite(2, LOW);
-  pinMode(3, OUTPUT);
-  digitalWrite(3, LOW);
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-  pinMode(5, OUTPUT);
-  digitalWrite(5, LOW);
-  pinMode(6, OUTPUT);
-  digitalWrite(6, LOW);
+  DDRB = B11111000;
+  PORTB = 0;
   phase[0] = 0;
   phase[1] = 0;
   phase[2] = 0;
@@ -116,7 +101,7 @@ void setup() {
   mode[1] = SILENT;
   mode[2] = SILENT;
   mode[3] = SILENT;
-  timerLoadValue=SetupTimer2(8000);
+  timerLoadValue=SetupTimer2(16000);
   while(Serial.available())
     Serial.read();
   Serial.print("Timer2 Load:");
@@ -136,6 +121,14 @@ void loop() {
     duty[ch] |= Serial.read();
     lowval[ch] = char(Serial.read());
     highval[ch] = char(Serial.read());
+ /*   Serial.print(lowval[ch], DEC);
+    Serial.print('=');
+    Serial.print((unsigned char)(lowval[ch] >> 3 & 0x0F), DEC);
+    Serial.print(' ');
+    Serial.print(highval[ch], DEC);
+    Serial.print('=');
+    Serial.print((unsigned char)(highval[ch] >> 3 | 0x10), DEC);
+    Serial.print('\n');*/
   }
   
   if(counter != lastCounter) {
